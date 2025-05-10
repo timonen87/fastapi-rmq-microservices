@@ -7,6 +7,7 @@ __pycache__/
 *.so
 
 # Virtual environments
+.venv/
 venv/
 auth/venv/
 gateway/venv/

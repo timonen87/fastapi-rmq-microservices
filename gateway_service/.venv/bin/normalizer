@@ -1,4 +1,4 @@
-#!/Users/timonen/projects/fastapi-rmq-microservices/gateway_service/.venv/bin/python3.12
+#!/Users/timonen/projects/fastapi-rmq-microservices/gateway_service/.venv/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys

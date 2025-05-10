@@ -1,0 +1,110 @@
+
+
+services:
+  gateway_service:
+    build:
+      context: ./gateway_service
+      dockerfile: Dockerfile
+    ports:
+      - "6001:6001"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - USER_SERVICE_URL=http://user_service:6000
+      - RABBITMQ_URL=rabbitmq
+      - CORS_ORIGINS=["*"]
+      - CORS_CREDENTIALS=true
+      - CORS_METHODS=["*"]
+      - CORS_HEADERS=["*"]
+    depends_on:
+      - user_service
+      - rabbitmq
+    networks:
+      - app-network
+
+  user_service:
+    build:
+      context: ./user_service
+      dockerfile: Dockerfile
+    # ports:
+    #   - "6000:6000"
+    environment:
+      - DATABASE_URI=postgresql://postgres:postgres@postgres:5432/userdb
+      - SECRET_KEY=${SECRET_KEY}
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=userdb
+      - RABBITMQ_URL=rabbitmq
+
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - app-network
+
+  ocr_service:
+    build:
+      context: ./ocr_service
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8001:8001"
+    environment:
+      - RABBITMQ_URL=rabbitmq
+    depends_on:
+      - rabbitmq
+    networks:
+      - app-network
+
+  notification_service:
+    build:
+      context: ./notification_service
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8002:8002"
+    environment:
+      - RABBITMQ_URL=rabbitmq
+      - SMTP_PORT=587
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_USER=timonen.as@gmail.com
+      - SMTP_PASSWORD=waknleqdwjvkvlti
+    depends_on:
+      - rabbitmq
+    command: ["python", "main.py"]
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=userdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672" # RabbitMQ default port
+      - "15672:15672" # RabbitMQ management interface
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+
+networks:
+  app-network:
+    driver: bridge
+

@@ -7,11 +7,9 @@ from models.user_model import User
 from sqlalchemy import select
 
 from db.session import SessionLocal, get_db
-import deps as _deps
-import service as _service
+from deps import get_user_by_email, authenticate_user, create_token, get_current_user, get_db, create_user as create_user_deps
+from service import send_otp, channel, generate_otp
 import logging
-
-
 
 
 router_users = APIRouter(
@@ -19,12 +17,11 @@ router_users = APIRouter(
 )
 
 
-
 @router_users.post("/api/users" ,  tags = ['User Auth'])
 async def create_user(
     user: UserCreate, 
     db: Session = Depends(get_db)):
-    db_user = await _deps.get_user_by_email(email=user.email, db=db)
+    db_user = await get_user_by_email(email=user.email, db=db)
 
     if db_user:
         logging.info('Пользователь с таким адресом электронной почты уже существует')
@@ -33,7 +30,7 @@ async def create_user(
             detail="Пользователь с таким адресом электронной почты уже существует")
     
 
-    user = await _deps.create_user(user=user, db=db)
+    user = await create_user_deps(user=user, db=db)
 
     return HTTPException(
             status_code=201,
@@ -46,7 +43,7 @@ async def generate_token(
     #form_data: _security.OAuth2PasswordRequestForm = _fastapi.Depends(), 
     user_data: GenerateUserToken,
     db: Session = Depends(get_db)):
-    user = await _deps.authenticate_user(email=user_data.username, password=user_data.password, db=db)
+    user = await authenticate_user(email=user_data.username, password=user_data.password, db=db)
 
     if not user.is_verified :
         logging.info('Проверка электронной почты еще не завершена. Пожалуйста, подтвердите свой адрес электронной почты, чтобы продолжить. ')
@@ -59,24 +56,24 @@ async def generate_token(
             status_code=401, detail="Invalid Credentials")
     
     logging.info('JWT Token Generated')
-    return await _deps.create_token(user=user)
+    return await create_token(user=user)
 
 
 @router_users.get("/api/users/me", response_model=UserSchema, tags = ['User Auth'])
-async def get_user(user: UserSchema = Depends(_deps.get_current_user)):
+async def get_user(user: UserSchema = Depends(get_current_user)):
     return user
 
 
 @router_users.get("/api/users/profile", tags=['User Auth'])
-async def get_user(email: str, db: Session = Depends(_deps.get_db)) -> UserSchema:
+async def get_user(email: str, db: Session = Depends(get_db)) -> UserSchema:
     query = select(User).filter_by(email=email)
     result = db.execute(query)
     return result.scalar_one_or_none()
   
 
 @router_users.post("/api/users/generate_otp", response_model=str, tags=["User Auth"])
-async def send_otp_mail(userdata: GenerateOtp, db: Session = Depends(_deps.get_db)):
-    user = await _deps.get_user_by_email(email=userdata.email, db=db)
+async def send_otp_mail(userdata: GenerateOtp, db: Session = Depends(get_db)):
+    user = await get_user_by_email(email=userdata.email, db=db)
 
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")
@@ -85,9 +82,8 @@ async def send_otp_mail(userdata: GenerateOtp, db: Session = Depends(_deps.get_d
         raise HTTPException(status_code=400, detail="Пользователь уже верифицирован")
 
     # Generate and send OTP
-    otp = _deps.generate_otp()
-    print(otp)
-    _service.send_otp(userdata.email, otp, _service.channel)
+    otp = generate_otp()
+    send_otp(userdata.email, otp, channel)
 
     # Store the OTP in the database
     user.otp = otp
@@ -98,8 +94,8 @@ async def send_otp_mail(userdata: GenerateOtp, db: Session = Depends(_deps.get_d
 
 
 @router_users.post("/api/users/verify_otp", tags=["User Auth"])
-async def verify_otp(userdata: VerifyOtp, db: Session = Depends(_deps.get_db)):
-    user = await _deps.get_user_by_email(email=userdata.email, db=db )
+async def verify_otp(userdata: VerifyOtp, db: Session = Depends(get_db)):
+    user = await get_user_by_email(email=userdata.email, db=db )
 
     if not user:
         raise HTTPException(status_code=404, detail="Пользователь не найден")

@@ -45,7 +45,7 @@ def main():
             else:
                 ch.basic_ack(delivery_tag=method.delivery_tag)  # Подтверждаем успешную обработку
         except Exception as e:
-            print(f"Error processing message: {e}")
+            print(f"Сообщение об ошибке при обработке: {e}")
             ch.basic_nack(delivery_tag=method.delivery_tag)  # Отправляем NACK при исключении
 
     # Начинаем слушать очередь "email_notification"

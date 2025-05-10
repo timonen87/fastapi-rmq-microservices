@@ -1,4 +1,4 @@
-import jwt
+
 from sqlalchemy.orm import Session
 import email_validator as _email_check
 from fastapi import Depends, HTTPException, security

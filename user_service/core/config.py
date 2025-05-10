@@ -1,24 +1,23 @@
-
-
-from typing import Any
 import os
 import secrets
+from typing import Any
+
 from dotenv import load_dotenv
-from pydantic_core.core_schema import FieldValidationInfo
 from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, field_validator
+from pydantic_core.core_schema import FieldValidationInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 load_dotenv()
 
 
 class Settings(BaseSettings):
-    MODE: str = 'development'
+    MODE: str = "development"
     API_VERSION: str = "v1"
     API_V1_STR: str = f"/api/{API_VERSION}"
     PROJENCT_NAME: str = "User service microservice"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 4  # 1 hour
 
-    RABBITMQ_URL: str 
+    RABBITMQ_URL: str
 
     DATABASE_USER: str
     DATABASE_PASSWORD: str
@@ -26,16 +25,12 @@ class Settings(BaseSettings):
     DATABASE_PORT: int
     DATABASE_NAME: str
 
-
     DATABASE_NAME_TEST: str
 
+    DATABASE_URI: PostgresDsn | str = ""
+    DATABASE_URI_TEST: PostgresDsn | str = ""
 
-
-    ASYNC_DATABASE_URI: PostgresDsn | str = ""
-    ASYNC_DATABASE_URI_TEST: PostgresDsn | str = ""
-    print(ASYNC_DATABASE_URI)
-
-    @field_validator("ASYNC_DATABASE_URI", mode="after")
+    @field_validator("DATABASE_URI", mode="after")
     def assemble_db_connection(cls, v: str | None, info: FieldValidationInfo) -> Any:
         if isinstance(v, str):
             if v == "":
@@ -49,7 +44,7 @@ class Settings(BaseSettings):
                 )
         return v
 
-    @field_validator("ASYNC_DATABASE_URI_TEST", mode="after")
+    @field_validator("DATABASE_URI_TEST", mode="after")
     def assemble_db_connection_test(
         cls, v: str | None, info: FieldValidationInfo
     ) -> Any:
@@ -64,9 +59,6 @@ class Settings(BaseSettings):
                     path=info.data["DATABASE_NAME_TEST"],
                 )
         return v
-
-    
-
 
     SECRET_KEY: str = secrets.token_urlsafe(32)
     BACKEND_CORS_ORIGINS: list[str] | list[AnyHttpUrl]
@@ -85,3 +77,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
