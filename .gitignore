@@ -9,10 +9,10 @@ __pycache__/
 # Virtual environments
 .venv/
 venv/
-auth/venv/
-gateway/venv/
-ml_services/venv/
-notification_service/venv/
+user_service/.venv/
+gateway_service/.venv/
+ocr_service/.venv/
+notification_service/.venv/
 
 # Environment variables file
 .env
