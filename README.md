@@ -47,29 +47,15 @@ source .venv/bin/activate  # для Linux/Mac
 ```
 
 3. **Настройка переменных окружения**
-Создайте файл `.env` в корневой директории:
-```env
-# Gateway Service
-SECRET_KEY=your-secret-key
-USER_SERVICE_URL=http://localhost:6000
-RABBITMQ_URL=amqp://guest:guest@localhost:5672/
+ 
+Скопировать содержимое `.env.example` в локальный файл `.env`
 
-# User Service
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/userdb
-SECRET_KEY=your-secret-key
-
-# Notification Service
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-```
 
 4. **Установка зависимостей для каждого сервиса**
 ```bash
 # Gateway Service
 cd gateway_service
-pip install -e .
+pip install -r requirements.txt
 
 # User Service
 cd ../user_service
@@ -176,16 +162,6 @@ docker-compose down
 3. Обновите docker-compose.yml
 4. Добавьте сервис в сеть app-network
 
-### Тестирование
-
-```bash
-# Запуск тестов для всех сервисов
-pytest
-
-# Запуск тестов для конкретного сервиса
-cd <service_directory>
-pytest
-```
 
 ## Безопасность
 
@@ -199,9 +175,4 @@ pytest
 ## Мониторинг и логирование
 
 - Логи доступны через Docker Compose: `docker-compose logs -f`
-- Метрики доступны через Prometheus (опционально)
-- Трейсинг через OpenTelemetry (опционально)
 
-## Лицензия
-
-MIT 

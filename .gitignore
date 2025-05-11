@@ -17,6 +17,8 @@ notification_service/venv/
 # Environment variables file
 .env
 
+
+
 # OS generated files
 .DS_Store
 Thumbs.db
@@ -36,3 +38,4 @@ pip-log.txt
 
 # Package manager directories
 node_modules/
+

@@ -13,7 +13,7 @@ async def login(user_data: UserCredentials):
     Аутентификация пользователя по логину и паролю.
     
     Args:
-        user_data (UserCredentials): Объект с полями `username` и `password`.
+        user_data (UserCredentials): Объект с полями `username`(email) и `password`.
     
     Returns:
         dict: Токены доступа (access_token, refresh_token) в случае успеха.
