@@ -66,8 +66,8 @@ services:
       - RABBITMQ_URL=rabbitmq
       - SMTP_PORT=587
       - SMTP_HOST=smtp.gmail.com
-      - SMTP_USER=timonen.as@gmail.com
-      - SMTP_PASSWORD=waknleqdwjvkvlti
+      - SMTP_USER=example@gmail.com
+      - SMTP_PASSWORD=password
     depends_on:
       - rabbitmq
     command: ["python", "main.py"]

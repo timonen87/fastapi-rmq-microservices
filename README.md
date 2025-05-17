@@ -34,7 +34,7 @@ fastapi-rmq-microservices/
 
 1. **Клонирование репозитория**
 ```bash
-git clone <repository-url>
+git clone git@github.com:timonen87/fastapi-rmq-microservices.git
 cd fastapi-rmq-microservices
 ```
 

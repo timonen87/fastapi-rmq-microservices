@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-RABBITMQ_URL = os.getenv("RABBITMQ_URL")
+nRABBITMQ_URL = os.getenv("RABBITMQ_URL")
 
 # Connect to RabbitMQ
 connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITMQ_URL))

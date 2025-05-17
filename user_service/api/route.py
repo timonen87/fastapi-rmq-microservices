@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, HTTPException, Response
 
 from schemas.user_schema import UserCreate, GenerateUserToken, UserSchema, GenerateOtp, VerifyOtp
